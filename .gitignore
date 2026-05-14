@@ -1,4 +1,14 @@
 .env
 *.env
-backend/.env
-backend/app/.env
+**/.env
+**/**.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pkl
+
+# Node
+node_modules/
+dist/
