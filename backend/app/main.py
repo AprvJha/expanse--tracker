@@ -2,9 +2,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import db
-from app.api.routes import upload, expenses, auth, categorize
+from app.api.routes import upload, expenses, auth, categorize, insights
 from ml.ml_categorizer import load_model
-
 app = FastAPI(title="Expense Tracker API")
 
 app.add_middleware(
@@ -29,3 +28,4 @@ app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(expenses.router)
 app.include_router(categorize.router)
+app.include_router(insights.router)

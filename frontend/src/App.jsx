@@ -8,6 +8,7 @@ import ExpensesPage from "./pages/ExpensesPage";
 import UploadPage from "./pages/UploadPage";
 import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
+import RoadmapPage from "./pages/RoadmapPage";
 
 // Protected route wrapper
 function ProtectedLayout({ children }) {
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
                 <Route path="/expenses" element={<ProtectedLayout><ExpensesPage /></ProtectedLayout>} />
                 <Route path="/upload" element={<ProtectedLayout><UploadPage /></ProtectedLayout>} />
+                <Route path="/roadmap" element={<RoadmapPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
         </BrowserRouter>

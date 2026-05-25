@@ -1,4 +1,3 @@
-import joblib
 import os
 from ml.categorizer import keyword_categorize
 
@@ -12,8 +11,14 @@ _model_data = None
 def load_model():
     global _model_data
     if os.path.exists(MODEL_PATH):
-        _model_data = joblib.load(MODEL_PATH)
-        print("[SUCCESS] ML categorizer model loaded")
+        try:
+            import joblib
+            _model_data = joblib.load(MODEL_PATH)
+            print("[SUCCESS] ML categorizer model loaded")
+        except Exception as e:
+            print(f"[WARNING] Could not load ML model: {e}")
+            print("[WARNING] Falling back to keyword baseline only")
+            _model_data = None
     else:
         print("[WARNING] No ML model found -- using keyword baseline only")
 
