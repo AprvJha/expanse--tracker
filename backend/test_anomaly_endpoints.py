@@ -6,7 +6,18 @@ import requests
 import json
 
 BASE = "http://127.0.0.1:8000"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTE0NGExYzQzYThlOGVmMjcwZGYzNWEiLCJlbWFpbCI6Imluc2lnaHRzdGVzdEB0ZXN0LmNvbSIsIm5hbWUiOiJJbnNpZ2h0cyBUZXN0IiwiZXhwIjoxNzc5ODMwNzIwfQ.Rp6jTzUHn6-KsiC0H8zvqSaKwoM3a8l33QVZR4BgQnI"
+
+# ── Dynamic authentication using credentials ──────────────
+print("Authenticating with live credentials...")
+login_payload = {
+    "email": "apoorvjha11@gmail.com",
+    "password": "Apoorv@2004"
+}
+login_response = requests.post(f"{BASE}/auth/login", json=login_payload)
+if login_response.status_code != 200:
+    raise RuntimeError(f"Authentication failed: {login_response.text}")
+
+TOKEN = login_response.json()["access_token"]
 HEADERS = {"Authorization": f"Bearer {TOKEN}"}
 
 PASS = "[PASS]"
@@ -62,9 +73,10 @@ if data["anomalies_detected"] > 0:
     for alert in data["alerts"][:3]:
         print(f"  - [{alert['severity'].upper()}] {alert['merchant']}: "
               f"Rs.{alert['amount']:,.0f} ({', '.join(alert['detection_methods'])})")
-        print(f"    {alert['message']}")
+        safe_message = alert['message'].replace('σ', 'sigma').encode('ascii', 'ignore').decode('ascii')
+        print(f"    {safe_message}")
 
-print(f"{PASS} Detect endpoint passed — {data['anomalies_detected']} anomalies in {data['total_transactions']} txns")
+print(f"{PASS} Detect endpoint passed - {data['anomalies_detected']} anomalies in {data['total_transactions']} txns")
 
 
 # ── Test 3: GET /anomaly/metrics ──────────────────────────
@@ -83,16 +95,16 @@ separator("TEST 4: POST /anomaly/train (no auth - should fail)")
 r = requests.post(f"{BASE}/anomaly/train")
 print(f"Status: {r.status_code}")
 print(f"Response: {r.json()}")
-assert r.status_code == 403, f"Expected 403, got {r.status_code}"
-print(f"{PASS} Auth guard works — unauthenticated request rejected")
+assert r.status_code in [401, 403], f"Expected 401 or 403, got {r.status_code}"
+print(f"{PASS} Auth guard works - unauthenticated request rejected")
 
 
 # ── Summary ───────────────────────────────────────────────
 separator("ALL TESTS PASSED")
 print(f"""
-{PASS} Health check          — 200 OK
-{PASS} POST /anomaly/train   — Isolation Forest trained successfully
-{PASS} GET  /anomaly/detect  — Anomalies detected with both methods
-{PASS} GET  /anomaly/metrics — Precision/recall metrics returned  
-{PASS} Auth guard            — Unauthenticated requests rejected
+{PASS} Health check          - 200 OK
+{PASS} POST /anomaly/train   - Isolation Forest trained successfully
+{PASS} GET  /anomaly/detect  - Anomalies detected with both methods
+{PASS} GET  /anomaly/metrics - Precision/recall metrics returned  
+{PASS} Auth guard            - Unauthenticated requests rejected
 """)

@@ -61,3 +61,27 @@ async def train_model(current_user: dict = Depends(get_current_user)):
     train_isolation_forest(df)
     return {"message": "Isolation Forest trained successfully",
             "trained_on": len(df)}
+
+
+@router.post("/train")
+async def train_model(current_user: dict = Depends(get_current_user)):
+    """Train/retrain the Isolation Forest model."""
+    try:
+        expenses = await fetch_expenses(current_user["id"])
+        df = to_dataframe(expenses)
+
+        print(f"Training on {len(df)} expenses")  # debug log
+        print(f"Columns: {df.columns.tolist()}")  # debug log
+
+        if len(df) < 50:
+            return {"error": f"Need at least 50 transactions, found {len(df)}"}
+
+        train_isolation_forest(df)
+        return {
+            "message": "Isolation Forest trained successfully",
+            "trained_on": len(df),
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()  # prints full error to terminal
+        return {"error": str(e)}

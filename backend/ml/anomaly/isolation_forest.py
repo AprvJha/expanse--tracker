@@ -14,33 +14,43 @@ MODEL_PATH = os.path.join(BASE_DIR, "ml", "models", "isolation_forest.pkl")
 
 def build_features(df: pd.DataFrame) -> np.ndarray:
     """
-    Build feature matrix for Isolation Forest.
-    Features: amount, category_encoded, day_of_week, day_of_month
+    Improved feature matrix.
+    Added: amount relative to category mean (normalized amount)
     """
     df = df.copy()
+    df["date"] = pd.to_datetime(df["date"])
 
-    # Encode category as number
+    # Encode category
     le = LabelEncoder()
     df["category_encoded"] = le.fit_transform(df["category"].astype(str))
 
     # Time features
-    df["day_of_week"] = pd.to_datetime(df["date"]).dt.dayofweek
-    df["day_of_month"] = pd.to_datetime(df["date"]).dt.day
+    df["day_of_week"] = df["date"].dt.dayofweek
+    df["day_of_month"] = df["date"].dt.day
+    df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
 
-    # Log transform amount (handles skewed distribution)
+    # Log transform amount
     df["log_amount"] = np.log1p(df["amount"])
 
-    features = df[[
+    # Amount relative to category mean (KEY NEW FEATURE)
+    category_means = df.groupby("category")["amount"].transform("mean")
+    category_stds = df.groupby("category")["amount"].transform("std").fillna(1)
+    df["amount_vs_category"] = (df["amount"] - category_means) / category_stds
+
+    feature_df = df[[
         "log_amount",
         "category_encoded",
         "day_of_week",
         "day_of_month",
-    ]].values
+        "is_weekend",
+        "amount_vs_category",
+    ]].fillna(0)
+    features = feature_df.values
 
     return features, le
 
 
-def train_isolation_forest(df: pd.DataFrame, contamination: float = 0.05):
+def train_isolation_forest(df: pd.DataFrame, contamination: float = 0.01):
     """
     Train Isolation Forest model.
     contamination = expected proportion of anomalies (5% = 0.05)
@@ -57,7 +67,7 @@ def train_isolation_forest(df: pd.DataFrame, contamination: float = 0.05):
 
     # Save model + encoder
     joblib.dump({"model": model, "encoder": le}, MODEL_PATH)
-    print(f"✅ Isolation Forest saved to {MODEL_PATH}")
+    print(f"[SUCCESS] Isolation Forest saved to {MODEL_PATH}")
 
     return model, le
 
@@ -92,14 +102,23 @@ def isolation_forest_detect(df: pd.DataFrame) -> pd.DataFrame:
 
     df["day_of_week"] = pd.to_datetime(df["date"]).dt.dayofweek
     df["day_of_month"] = pd.to_datetime(df["date"]).dt.day
+    df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
     df["log_amount"] = np.log1p(df["amount"])
 
-    features = df[[
+    # Amount vs category mean
+    category_means = df.groupby("category")["amount"].transform("mean")
+    category_stds = df.groupby("category")["amount"].transform("std").fillna(1)
+    df["amount_vs_category"] = (df["amount"] - category_means) / category_stds
+
+    feature_df = df[[
         "log_amount",
         "category_encoded",
         "day_of_week",
         "day_of_month",
-    ]].values
+        "is_weekend",
+        "amount_vs_category",
+    ]].fillna(0)
+    features = feature_df.values
 
     # -1 = anomaly, 1 = normal
     predictions = model.predict(features)

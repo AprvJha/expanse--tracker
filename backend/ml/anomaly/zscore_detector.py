@@ -67,7 +67,7 @@ def zscore_detect(df: pd.DataFrame, threshold: float = 2.5) -> pd.DataFrame:
     return df
 
 
-def evaluate_zscore(df: pd.DataFrame, threshold: float = 2.5) -> dict:
+def evaluate_zscore(df: pd.DataFrame, threshold: float = 3.0) -> dict:
     """
     Evaluate Z-score detector against labeled anomalies.
     Returns precision, recall, f1.
