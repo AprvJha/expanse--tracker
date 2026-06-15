@@ -1,18 +1,34 @@
 // frontend/src/pages/DashboardPage.jsx
 import { useEffect, useState } from "react";
-import { expensesAPI } from "../services/api";
+import { Link } from "react-router-dom";
+import { expensesAPI, predictionAPI, suggestionsAPI } from "../services/api";
 import StatCard from "../components/UI/StatCard";
-import { formatCurrency, CATEGORY_COLORS } from "../utils/formatters";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { formatCurrency, CATEGORY_COLORS, SEVERITY_COLORS } from "../utils/formatters";
+import {
+    PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+    AreaChart, Area, XAxis, YAxis, CartesianGrid,
+} from "recharts";
 
 export default function DashboardPage() {
     const [summary, setSummary] = useState(null);
+    const [forecast, setForecast] = useState(null);
+    const [topSuggestion, setTopSuggestion] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        expensesAPI.summary()
-            .then((res) => setSummary(res.data))
-            .finally(() => setLoading(false));
+        Promise.all([
+            expensesAPI.summary(),
+            predictionAPI.forecast(30).catch(() => ({ data: null })),
+            suggestionsAPI.list().catch(() => ({ data: null })),
+        ]).then(([summaryRes, forecastRes, suggestionsRes]) => {
+            setSummary(summaryRes.data);
+            if (forecastRes.data && !forecastRes.data.error) {
+                setForecast(forecastRes.data);
+            }
+            if (suggestionsRes.data?.suggestions?.length > 0) {
+                setTopSuggestion(suggestionsRes.data.suggestions[0]);
+            }
+        }).finally(() => setLoading(false));
     }, []);
 
     if (loading) return (
@@ -27,8 +43,34 @@ export default function DashboardPage() {
                 Dashboard
             </h2>
 
+            {/* Top suggestion banner */}
+            {topSuggestion && (
+                <div style={{
+                    background: `${SEVERITY_COLORS[topSuggestion.severity] || "#38bdf8"}0c`,
+                    border: `1px solid ${SEVERITY_COLORS[topSuggestion.severity] || "#38bdf8"}40`,
+                    borderLeft: `3px solid ${SEVERITY_COLORS[topSuggestion.severity] || "#38bdf8"}`,
+                    borderRadius: 8, padding: "14px 20px", marginBottom: 24,
+                    display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16,
+                }}>
+                    <div>
+                        <div style={{ fontSize: 13, color: "#f1f5f9", fontWeight: 600, marginBottom: 4 }}>
+                            {topSuggestion.title}
+                        </div>
+                        <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                            {topSuggestion.recommendation}
+                        </div>
+                    </div>
+                    <Link to="/insights" style={{
+                        fontSize: 11, color: SEVERITY_COLORS[topSuggestion.severity] || "#38bdf8",
+                        textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap",
+                    }}>
+                        View all →
+                    </Link>
+                </div>
+            )}
+
             {/* Stat Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 16 }}>
                 <StatCard
                     label="Total Spent"
                     value={formatCurrency(summary?.total_spent || 0)}
@@ -48,6 +90,39 @@ export default function DashboardPage() {
                     color="#a78bfa"
                 />
             </div>
+
+            {/* Forecast chart */}
+            {forecast && (
+                <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 24, marginBottom: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, color: "#475569", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                            30-Day Forecast
+                        </div>
+                        <div style={{ fontSize: 13, color: "#00ff9d" }}>
+                            Predicted total: {formatCurrency(forecast.total_predicted)}
+                        </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height={180}>
+                        <AreaChart data={forecast.predictions}>
+                            <defs>
+                                <linearGradient id="forecastGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#00ff9d" stopOpacity={0.3} />
+                                    <stop offset="100%" stopColor="#00ff9d" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
+                            <XAxis dataKey="date" tick={{ fill: "#475569", fontSize: 10 }} tickFormatter={(d) => d.slice(5)} />
+                            <YAxis tick={{ fill: "#475569", fontSize: 10 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                            <Tooltip
+                                formatter={(val) => formatCurrency(val)}
+                                contentStyle={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 6 }}
+                                labelStyle={{ color: "#94a3b8" }}
+                            />
+                            <Area type="monotone" dataKey="predicted_amount" stroke="#00ff9d" fill="url(#forecastGradient)" strokeWidth={2} />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
 
             {/* Category Breakdown */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>

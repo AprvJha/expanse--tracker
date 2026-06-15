@@ -6,6 +6,8 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import UploadPage from "./pages/UploadPage";
+import InsightsPage from "./pages/InsightsPage";
+import AnomaliesPage from "./pages/AnomaliesPage";
 import Navbar from "./components/Layout/Navbar";
 import Sidebar from "./components/Layout/Sidebar";
 import RoadmapPage from "./pages/RoadmapPage";
@@ -34,6 +36,8 @@ export default function App() {
                 <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
                 <Route path="/expenses" element={<ProtectedLayout><ExpensesPage /></ProtectedLayout>} />
                 <Route path="/upload" element={<ProtectedLayout><UploadPage /></ProtectedLayout>} />
+                <Route path="/insights" element={<ProtectedLayout><InsightsPage /></ProtectedLayout>} />
+                <Route path="/anomalies" element={<ProtectedLayout><AnomaliesPage /></ProtectedLayout>} />
                 <Route path="/roadmap" element={<RoadmapPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

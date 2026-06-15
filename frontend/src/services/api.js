@@ -53,5 +53,30 @@ export const uploadAPI = {
         });
     },
 };
+// ── Insights (Phase 3) ────────────────────────────────
+export const insightsAPI = {
+    list: () => api.get("/insights/"),
+    full: () => api.get("/insights/full"),
+};
+
+// ── Anomaly Detection (Phase 4) ───────────────────────
+export const anomalyAPI = {
+    detect: () => api.get("/anomaly/detect"),
+    metrics: () => api.get("/anomaly/metrics"),
+    train: () => api.post("/anomaly/train"),
+};
+
+// ── Prediction (Phase 5) ───────────────────────────────
+export const predictionAPI = {
+    forecast: (days) => api.get(`/prediction/forecast?days=${days}`),
+    metrics: () => api.get("/prediction/metrics"),
+    train: () => api.post("/prediction/train"),
+};
+
+// ── Suggestions (Phase 6) ──────────────────────────────
+export const suggestionsAPI = {
+    list: () => api.get("/suggestions/"),
+};
+
 
 export default api;

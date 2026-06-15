@@ -24,3 +24,11 @@ export const CATEGORY_COLORS = {
     Uncategorized: "#94a3b8",
     Other: "#94a3b8",
 };
+
+export const SEVERITY_COLORS = {
+    high: "#f43f5e",
+    medium: "#facc15",
+    warning: "#facc15",
+    low: "#38bdf8",
+    info: "#38bdf8",
+};
