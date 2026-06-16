@@ -49,19 +49,6 @@ async def anomaly_metrics(current_user: dict = Depends(get_current_user)):
     return get_anomaly_metrics(expenses)
 
 
-@router.post("/train")
-async def train_model(current_user: dict = Depends(get_current_user)):
-    """Train/retrain the Isolation Forest model."""
-    expenses = await fetch_expenses(current_user["id"])
-    df = to_dataframe(expenses)
-
-    if len(df) < 50:
-        return {"error": "Need at least 50 transactions to train"}
-
-    train_isolation_forest(df)
-    return {"message": "Isolation Forest trained successfully",
-            "trained_on": len(df)}
-
 
 @router.post("/train")
 async def train_model(current_user: dict = Depends(get_current_user)):
