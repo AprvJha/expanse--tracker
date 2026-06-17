@@ -1,5 +1,5 @@
 # backend/app/api/routes/anomaly.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from app.api.routes.auth import get_current_user
 from app.core.database import get_database
 from ml.anomaly.detector import detect_anomalies, get_anomaly_metrics
@@ -20,11 +20,12 @@ async def fetch_expenses(user_id: str) -> list[dict]:
 
 
 @router.get("/detect")
-async def detect(current_user: dict = Depends(get_current_user)):
+async def detect(response: Response, current_user: dict = Depends(get_current_user)):
     """
     Run anomaly detection on all user transactions.
     Returns list of flagged transactions with severity + message.
     """
+    response.headers["Cache-Control"] = "no-store"
     expenses = await fetch_expenses(current_user["id"])
     alerts = detect_anomalies(expenses)
 
@@ -39,12 +40,13 @@ async def detect(current_user: dict = Depends(get_current_user)):
 
 
 @router.get("/metrics")
-async def anomaly_metrics(current_user: dict = Depends(get_current_user)):
+async def anomaly_metrics(response: Response, current_user: dict = Depends(get_current_user)):
     """
     Evaluate detection accuracy against labeled anomalies.
     Returns precision/recall/f1 for Z-score and Isolation Forest.
     THIS is what you show in interviews.
     """
+    response.headers["Cache-Control"] = "no-store"
     expenses = await fetch_expenses(current_user["id"])
     return get_anomaly_metrics(expenses)
 

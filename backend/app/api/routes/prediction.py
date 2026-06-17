@@ -1,5 +1,5 @@
 # backend/app/api/routes/prediction.py
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from app.api.routes.auth import get_current_user
 from app.core.database import get_database
 from ml.prediction.predictor import train_predictor, predict_next_days
@@ -38,6 +38,7 @@ async def train(current_user: dict = Depends(get_current_user)):
 
 @router.get("/forecast")
 async def forecast(
+    response: Response,
     days: int = Query(default=30, ge=7, le=90),
     current_user: dict = Depends(get_current_user),
 ):
@@ -45,6 +46,7 @@ async def forecast(
     Predict spend for next N days (7–90).
     Returns daily predictions + total.
     """
+    response.headers["Cache-Control"] = "no-store"
     try:
         expenses = await fetch_expenses(current_user["id"])
         return predict_next_days(expenses, days=days)
