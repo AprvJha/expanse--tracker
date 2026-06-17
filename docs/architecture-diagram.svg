@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" font-family="'JetBrains Mono', 'Courier New', monospace">
+
+  <!-- Background -->
+  <rect width="1200" height="780" fill="#07090d"/>
+
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" fill="#f1f5f9" font-size="20" font-weight="700">Expense Tracker — System Architecture</text>
+  <text x="600" y="62" text-anchor="middle" fill="#475569" font-size="12">Stateless backend — ML models retrain from MongoDB on every cold start</text>
+
+  <!-- ============ CLIENT LAYER ============ -->
+  <rect x="60" y="100" width="280" height="90" rx="8" fill="#0d1117" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="200" y="128" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">React Frontend</text>
+  <text x="200" y="148" text-anchor="middle" fill="#94a3b8" font-size="11">Vite + Recharts</text>
+  <text x="200" y="166" text-anchor="middle" fill="#475569" font-size="10">Deployed: Vercel</text>
+
+  <!-- Arrow client -> backend -->
+  <line x1="340" y1="145" x2="430" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="385" y="135" text-anchor="middle" fill="#475569" font-size="9">HTTPS / JWT</text>
+
+  <!-- ============ BACKEND LAYER ============ -->
+  <rect x="430" y="90" width="320" height="110" rx="8" fill="#0d1117" stroke="#f97316" stroke-width="1.5"/>
+  <text x="590" y="118" text-anchor="middle" fill="#f97316" font-size="13" font-weight="700">FastAPI Backend</text>
+  <text x="590" y="138" text-anchor="middle" fill="#94a3b8" font-size="11">8 route modules · JWT auth</text>
+  <text x="590" y="156" text-anchor="middle" fill="#94a3b8" font-size="11">Bootstrap: auto-trains ML on startup</text>
+  <text x="590" y="178" text-anchor="middle" fill="#475569" font-size="10">Deployed: Render</text>
+
+  <!-- Arrow backend -> db -->
+  <line x1="590" y1="200" x2="590" y2="250" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="650" y="228" text-anchor="middle" fill="#475569" font-size="9">motor (async)</text>
+
+  <!-- ============ DATABASE ============ -->
+  <rect x="430" y="250" width="320" height="80" rx="8" fill="#0d1117" stroke="#00ff9d" stroke-width="1.5"/>
+  <text x="590" y="280" text-anchor="middle" fill="#00ff9d" font-size="13" font-weight="700">MongoDB Atlas</text>
+  <text x="590" y="300" text-anchor="middle" fill="#94a3b8" font-size="11">users · expenses (1,300+ docs)</text>
+  <text x="590" y="318" text-anchor="middle" fill="#475569" font-size="10">Single source of truth — survives redeploys</text>
+
+  <!-- Arrow backend -> ml layer -->
+  <line x1="750" y1="145" x2="850" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="800" y="135" text-anchor="middle" fill="#475569" font-size="9">imports</text>
+
+  <!-- ============ ML LAYER ============ -->
+  <rect x="850" y="90" width="290" height="500" rx="8" fill="#0d1117" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="995" y="118" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">ML / Data Science Layer</text>
+
+  <!-- Phase 2 -->
+  <rect x="875" y="140" width="240" height="64" rx="6" fill="#06080c" stroke="#1e2d3d"/>
+  <text x="995" y="160" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="600">Categorization (Phase 2)</text>
+  <text x="995" y="176" text-anchor="middle" fill="#64748b" font-size="9">Keyword baseline vs TF-IDF + LogReg</text>
+  <text x="995" y="192" text-anchor="middle" fill="#64748b" font-size="9">char n-grams (2-4)</text>
+
+  <!-- Phase 3 -->
+  <rect x="875" y="216" width="240" height="64" rx="6" fill="#06080c" stroke="#1e2d3d"/>
+  <text x="995" y="236" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="600">Behavioral Insights (Phase 3)</text>
+  <text x="995" y="252" text-anchor="middle" fill="#64748b" font-size="9">Weekend ratio, concentration,</text>
+  <text x="995" y="266" text-anchor="middle" fill="#64748b" font-size="9">recurring detection, trends</text>
+
+  <!-- Phase 4 -->
+  <rect x="875" y="292" width="240" height="64" rx="6" fill="#06080c" stroke="#1e2d3d"/>
+  <text x="995" y="312" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="600">Anomaly Detection (Phase 4)</text>
+  <text x="995" y="328" text-anchor="middle" fill="#64748b" font-size="9">Z-score + Isolation Forest</text>
+  <text x="995" y="342" text-anchor="middle" fill="#64748b" font-size="9">P: 0.75-0.80 · R: 0.67-0.83</text>
+
+  <!-- Phase 5 -->
+  <rect x="875" y="368" width="240" height="64" rx="6" fill="#06080c" stroke="#1e2d3d"/>
+  <text x="995" y="388" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="600">Expense Prediction (Phase 5)</text>
+  <text x="995" y="404" text-anchor="middle" fill="#64748b" font-size="9">Linear Regression + rolling avg</text>
+  <text x="995" y="418" text-anchor="middle" fill="#64748b" font-size="9">MAE: 3.8% vs 5.2% baseline</text>
+
+  <!-- Phase 6 -->
+  <rect x="875" y="444" width="240" height="64" rx="6" fill="#06080c" stroke="#1e2d3d"/>
+  <text x="995" y="464" text-anchor="middle" fill="#f1f5f9" font-size="11" font-weight="600">Suggestions Engine (Phase 6)</text>
+  <text x="995" y="480" text-anchor="middle" fill="#64748b" font-size="9">Rule-based · consumes outputs</text>
+  <text x="995" y="494" text-anchor="middle" fill="#64748b" font-size="9">from Phases 2-5 — no new models</text>
+
+  <!-- Bootstrap note -->
+  <rect x="875" y="520" width="240" height="52" rx="6" fill="#0a1410" stroke="#00ff9d40"/>
+  <text x="995" y="540" text-anchor="middle" fill="#00ff9d" font-size="9" font-weight="600">bootstrap.py</text>
+  <text x="995" y="555" text-anchor="middle" fill="#64748b" font-size="9">Retrains missing models from</text>
+  <text x="995" y="567" text-anchor="middle" fill="#64748b" font-size="9">MongoDB on cold start</text>
+
+  <!-- Connecting lines between phases (vertical flow) -->
+  <line x1="995" y1="204" x2="995" y2="216" stroke="#1e2d3d" stroke-width="1"/>
+  <line x1="995" y1="280" x2="995" y2="292" stroke="#1e2d3d" stroke-width="1"/>
+  <line x1="995" y1="356" x2="995" y2="368" stroke="#1e2d3d" stroke-width="1"/>
+  <line x1="995" y1="432" x2="995" y2="444" stroke="#1e2d3d" stroke-width="1"/>
+
+  <!-- ============ FRONTEND PAGES (bottom) ============ -->
+  <text x="200" y="420" fill="#475569" font-size="11" font-weight="600">Frontend Pages</text>
+  <g font-size="10" fill="#94a3b8">
+    <rect x="60" y="435" width="280" height="28" rx="4" fill="#06080c" stroke="#1e2d3d"/>
+    <text x="200" y="453" text-anchor="middle">Dashboard — forecast + top suggestion</text>
+
+    <rect x="60" y="470" width="280" height="28" rx="4" fill="#06080c" stroke="#1e2d3d"/>
+    <text x="200" y="488" text-anchor="middle">Insights — patterns + recommendations</text>
+
+    <rect x="60" y="505" width="280" height="28" rx="4" fill="#06080c" stroke="#1e2d3d"/>
+    <text x="200" y="523" text-anchor="middle">Anomalies — model metrics + flagged txns</text>
+
+    <rect x="60" y="540" width="280" height="28" rx="4" fill="#06080c" stroke="#1e2d3d"/>
+    <text x="200" y="558" text-anchor="middle">Expenses — paginated transaction table</text>
+
+    <rect x="60" y="575" width="280" height="28" rx="4" fill="#06080c" stroke="#1e2d3d"/>
+    <text x="200" y="593" text-anchor="middle">Upload — drag-drop CSV with cleaning stats</text>
+  </g>
+
+  <!-- Deployment footnote -->
+  <rect x="60" y="660" width="1080" height="80" rx="8" fill="#0d1117" stroke="#1e2d3d"/>
+  <text x="600" y="685" text-anchor="middle" fill="#f1f5f9" font-size="12" font-weight="600">Deployment Notes</text>
+  <text x="600" y="705" text-anchor="middle" fill="#64748b" font-size="10">Render free tier filesystem is ephemeral — no model files persist across deploys.</text>
+  <text x="600" y="722" text-anchor="middle" fill="#64748b" font-size="10">bootstrap_models() checks for missing .pkl files on every startup and retrains from MongoDB — making the backend fully stateless and self-healing.</text>
+
+  <!-- Arrow marker def -->
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#475569"/>
+    </marker>
+  </defs>
+
+</svg>
