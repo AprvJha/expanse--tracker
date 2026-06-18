@@ -70,25 +70,20 @@ npm run dev
 - Model metrics above are measured on synthetic, generator-produced data with controlled patterns. Keyword categorization accuracy is inflated because generated merchant names match the keyword list exactly — real bank statements ("SWIGGY\*ORDER293821") will lower keyword accuracy while the ML model degrades more gracefully due to character n-gram matching.
 - Real bank data integration (CSV upload) is supported and tested with 5 statement formats, but full production deployment would use India's Account Aggregator framework rather than manual CSV export.
 - Free-tier hosting means the backend sleeps after 15 minutes of inactivity; the first request after idle time triggers model retraining and may take up to a minute.
+- ML models (categorizer, Isolation Forest, predictor) are trained globally across all data rather than per-user, since any single new account has too little data to train its own model. Per-user evaluation metrics and predictions are still computed only from that user's own transactions — a brand-new account with zero transactions correctly shows empty states across the dashboard, anomaly, and forecast pages rather than another account's cached results. This was caught and fixed during manual multi-account testing before deployment, not assumed correct by default.
 
 ## Project Structure
 
+```
 expense-tracker/
-
 ├── backend/
-
 │   ├── app/            # FastAPI routes, auth, database
-
 │   └── ml/              # categorization, insights, anomaly, prediction, suggestions
-
 └── frontend/
-
-└── src/
-
-├── pages/        # Dashboard, Insights, Anomalies, Expenses, Upload
-
-└── services/     # API client
-
+    └── src/
+        ├── pages/        # Dashboard, Insights, Anomalies, Expenses, Upload
+        └── services/     # API client
+```
 
 ## Author
 
