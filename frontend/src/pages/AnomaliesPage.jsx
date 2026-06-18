@@ -22,6 +22,7 @@ export default function AnomaliesPage() {
     );
 
     const hasMetrics = metrics?.zscore && metrics?.isolation_forest;
+    const hasLabeledData = metrics?.labeled_anomalies > 0;
 
     return (
         <div style={{ padding: 32, fontFamily: "monospace" }}>
@@ -31,7 +32,7 @@ export default function AnomaliesPage() {
             </p>
 
             {/* Model metrics */}
-            {hasMetrics ? (
+            {hasMetrics && hasLabeledData ? (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
                     {[
                         { name: "Z-Score", data: metrics.zscore, color: "#38bdf8" },
@@ -63,9 +64,13 @@ export default function AnomaliesPage() {
                         </div>
                     ))}
                 </div>
+            ) : hasMetrics && !hasLabeledData ? (
+                <div style={{ color: "#475569", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
+                    No labeled anomalies in this account's data yet — precision/recall require known ground truth to evaluate against. Detection still runs on all transactions below.
+                </div>
             ) : (
-                <div style={{ color: "#64748b", fontSize: 13, padding: 24, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24, textAlign: "center" }}>
-                    {metrics?.message || "No labeled anomaly data available. Add expenses with labeled anomalies to see model evaluation metrics."}
+                <div style={{ color: "#334155", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
+                    Model not trained yet — run POST /anomaly/train
                 </div>
             )}
 
