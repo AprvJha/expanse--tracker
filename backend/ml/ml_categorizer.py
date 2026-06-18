@@ -24,28 +24,20 @@ def load_model():
 
 
 def ml_categorize(merchant: str) -> dict:
-    """
-    Categorize using ML model if available.
-    Falls back to keyword baseline if model not loaded.
-    """
     if _model_data is None:
         category, confidence = keyword_categorize(merchant)
-        return {
-            "category": category,
-            "confidence": confidence,
-            "method": "keyword",
-        }
+        return {"category": category, "confidence": confidence, "method": "keyword"}
 
     pipeline = _model_data["pipeline"]
-    category = pipeline.predict([merchant])[0]
-    proba = pipeline.predict_proba([merchant])[0]
-    confidence = float(max(proba))
-
-    return {
-        "category": category,
-        "confidence": round(confidence, 3),
-        "method": "ml",
-    }
+    try:
+        category = pipeline.predict([merchant])[0]
+        proba = pipeline.predict_proba([merchant])[0]
+        confidence = float(max(proba))
+        return {"category": category, "confidence": round(confidence, 3), "method": "ml"}
+    except Exception as e:
+        print(f"[ml_categorize] ML prediction failed, falling back to keyword: {e}")
+        category, confidence = keyword_categorize(merchant)
+        return {"category": category, "confidence": confidence, "method": "keyword_fallback"}
 
 
 def bulk_ml_categorize(merchants: list[str]) -> list[dict]:

@@ -22,45 +22,34 @@ async def fetch_all_expenses() -> list[dict]:
 
 async def bootstrap_models():
     """
-    Ensure all ML models exist on disk, training them from MongoDB
-    data if missing. Runs on every cold start — handles ephemeral
-    deployment filesystems where local .pkl files don't persist.
+    Always retrain all models on startup. This guarantees the
+    models match the currently-installed library versions and
+    avoids cross-version pickle incompatibility if Render's disk
+    persists stale files across redeploys.
     """
     os.makedirs(MODELS_DIR, exist_ok=True)
 
-    # ── Categorizer (Phase 2) ──────────────────────────
-    if not os.path.exists(CATEGORIZER_PATH):
-        print("[bootstrap] Training categorizer...")
-        from ml.trainer import train
-        try:
-            await train()
-        except Exception as e:
-            print(f"[bootstrap] Categorizer training skipped: {e}")
-    else:
-        print("[bootstrap] Categorizer model found")
+    print("[bootstrap] Training categorizer...")
+    from ml.trainer import train
+    try:
+        await train()
+    except Exception as e:
+        print(f"[bootstrap] Categorizer training failed: {e}")
 
     expenses = await fetch_all_expenses()
 
-    # ── Isolation Forest (Phase 4) ─────────────────────
-    if not os.path.exists(ISOLATION_FOREST_PATH):
-        print("[bootstrap] Training Isolation Forest...")
-        if len(expenses) >= 50:
-            from ml.insights.patterns import to_dataframe
-            from ml.anomaly.isolation_forest import train_isolation_forest
-            df = to_dataframe(expenses)
-            train_isolation_forest(df)
-        else:
-            print("[bootstrap] Not enough data for Isolation Forest")
+    print("[bootstrap] Training Isolation Forest...")
+    if len(expenses) >= 50:
+        from ml.insights.patterns import to_dataframe
+        from ml.anomaly.isolation_forest import train_isolation_forest
+        df = to_dataframe(expenses)
+        train_isolation_forest(df)
     else:
-        print("[bootstrap] Isolation Forest model found")
+        print("[bootstrap] Not enough data for Isolation Forest")
 
-    # ── Predictor (Phase 5) ────────────────────────────
-    if not os.path.exists(PREDICTOR_PATH):
-        print("[bootstrap] Training predictor...")
-        from ml.prediction.predictor import train_predictor
-        try:
-            train_predictor(expenses)
-        except Exception as e:
-            print(f"[bootstrap] Predictor training skipped: {e}")
-    else:
-        print("[bootstrap] Predictor model found")
+    print("[bootstrap] Training predictor...")
+    from ml.prediction.predictor import train_predictor
+    try:
+        train_predictor(expenses)
+    except Exception as e:
+        print(f"[bootstrap] Predictor training failed: {e}")
