@@ -67,30 +67,30 @@ def train_predictor(expenses: list[dict]) -> dict:
     joblib.dump({
         "model": model,
         "scaler": scaler,
-        "mae": 420.50,
-        "rmse": 500.00,
-        "mae_pct": 3.8,
-        "baseline_mae": 580.20,
-        "baseline_mae_pct": 5.2,
-        "avg_daily_spend": 11050.00,
+        "mae": mae,
+        "rmse": rmse,
+        "mae_pct": mae_pct,
+        "baseline_mae": baseline_mae,
+        "baseline_mae_pct": baseline_mae_pct,
+        "avg_daily_spend": avg_spend,
     }, MODEL_PATH)
 
     print(f"[OK] Predictor saved")
-    print(f"   Linear Regression MAE: Rs.420 (3.8%)")
-    print(f"   Rolling Average MAE:   Rs.580 (5.2%)")
+    print(f"   Linear Regression MAE: Rs.{mae:.0f} ({mae_pct:.1f}%)")
+    print(f"   Rolling Average MAE:   Rs.{baseline_mae:.0f} ({baseline_mae_pct:.1f}%)")
 
     return {
         "linear_regression": {
-            "mae": 420.50,
-            "mae_pct": 3.8
+            "mae": round(mae, 2),
+            "mae_pct": round(mae_pct, 2)
         },
         "rolling_average_baseline": {
-            "mae": 580.20,
-            "mae_pct": 5.2
+            "mae": round(baseline_mae, 2),
+            "mae_pct": round(baseline_mae_pct, 2)
         },
-        "avg_daily_spend": 11050.00,
-        "train_days": 144,
-        "test_days": 36
+        "avg_daily_spend": round(avg_spend, 2),
+        "train_days": split,
+        "test_days": len(X) - split
     }
 
 
@@ -99,31 +99,73 @@ def predict_next_days(expenses: list[dict], days: int = 30) -> dict:
     Predict spend for next N days.
     Returns daily predictions + total.
     """
+    # No expenses = nothing to predict
+    if not expenses:
+        return {
+            "days": days,
+            "total_predicted": 0,
+            "avg_daily_predicted": 0,
+            "predictions": [],
+            "message": "No expense data available for predictions.",
+        }
+
     if not os.path.exists(MODEL_PATH):
         raise ValueError("Model not trained yet. Call /prediction/train first.")
 
     model_data = joblib.load(MODEL_PATH)
+    model = model_data["model"]
+    scaler = model_data["scaler"]
 
-    start_date = pd.to_datetime("2026-05-30")
+    # Build daily features from existing expenses to get rolling averages
+    daily = build_daily_features(expenses)
+
+    if daily.empty or len(daily) < 7:
+        raise ValueError("Need at least 7 days of data to forecast.")
+
+    # Use the last row's rolling stats as baseline for future predictions
+    last_row = daily.iloc[-1]
+    rolling_7d = last_row.get("rolling_7d", 0) or 0
+    rolling_30d = last_row.get("rolling_30d", 0) or 0
+    last_total = last_row.get("total", 0) or 0
+    lag_7_total = daily.iloc[-7]["total"] if len(daily) >= 7 else 0
+
+    start_date = pd.Timestamp.now().normalize() + pd.Timedelta(days=1)
     predictions = []
 
     for i in range(days):
         future_date = start_date + pd.Timedelta(days=i)
-        is_weekend = future_date.dayofweek == 6  # Sunday is True, others False to match expected example
-        pred = 14800.00 if is_weekend else 9200.00
+        is_weekend = future_date.dayofweek >= 5
+
+        features = np.array([[
+            future_date.dayofweek,        # day_of_week
+            int(is_weekend),              # is_weekend
+            future_date.day,              # day_of_month
+            future_date.month,            # month
+            int(future_date.day <= 3),    # is_payday
+            int(future_date.day >= 28),   # is_month_end
+            rolling_7d,                   # rolling_7d
+            rolling_30d,                  # rolling_30d
+            last_total,                   # lag_1
+            lag_7_total,                  # lag_7
+        ]])
+
+        features_scaled = scaler.transform(features)
+        pred = float(max(model.predict(features_scaled)[0], 0))
 
         predictions.append({
             "date": future_date.strftime("%Y-%m-%d"),
-            "predicted_amount": pred,
+            "predicted_amount": round(pred, 2),
             "is_weekend": is_weekend,
         })
 
-    if days == 30:
-        total = 325000.00
-        avg_daily = 10833.33
-    else:
-        total = sum(p["predicted_amount"] for p in predictions)
-        avg_daily = total / days
+        # Update rolling context for next iteration
+        lag_7_total = last_total
+        last_total = pred
+        rolling_7d = (rolling_7d * 6 + pred) / 7
+        rolling_30d = (rolling_30d * 29 + pred) / 30
+
+    total = sum(p["predicted_amount"] for p in predictions)
+    avg_daily = total / days if days > 0 else 0
 
     return {
         "days": days,

@@ -92,7 +92,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Forecast chart */}
-            {forecast && (
+            {forecast && forecast.predictions?.length > 0 ? (
                 <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 24, marginBottom: 16 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
                         <div style={{ fontSize: 12, color: "#475569", textTransform: "uppercase", letterSpacing: "0.1em" }}>
@@ -121,6 +121,18 @@ export default function DashboardPage() {
                             <Area type="monotone" dataKey="predicted_amount" stroke="#00ff9d" fill="url(#forecastGradient)" strokeWidth={2} />
                         </AreaChart>
                     </ResponsiveContainer>
+                </div>
+            ) : (
+                <div style={{
+                    background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8,
+                    padding: "40px 24px", marginBottom: 16, textAlign: "center",
+                }}>
+                    <div style={{ fontSize: 12, color: "#475569", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+                        30-Day Forecast
+                    </div>
+                    <div style={{ fontSize: 13, color: "#64748b" }}>
+                        No forecast available yet. Add expenses and train the model to see predictions.
+                    </div>
                 </div>
             )}
 

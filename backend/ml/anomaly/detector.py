@@ -94,31 +94,44 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
     Evaluate both detectors against labeled anomalies.
     Returns precision/recall/f1 for each method.
     """
-    return {
-        "labeled_anomalies": 6,
-        "zscore": {
-            "method": "zscore",
-            "threshold": 2.5,
-            "true_positives": 5,
-            "false_positives": 3,
-            "false_negatives": 1,
-            "precision": 0.75,
-            "recall": 0.83,
-            "f1": 0.79,
-            "total_flagged": 8
-        },
-        "isolation_forest": {
-            "method": "isolation_forest",
-            "true_positives": 4,
-            "false_positives": 1,
-            "false_negatives": 2,
-            "precision": 0.80,
-            "recall": 0.67,
-            "f1": 0.73,
-            "total_flagged": 5
-        },
-        "summary": {
-            "best_precision": 0.80,
-            "best_recall": 0.83
+    df = to_dataframe(expenses)
+
+    # No data = no metrics to show
+    if df.empty:
+        return {
+            "labeled_anomalies": 0,
+            "zscore": None,
+            "isolation_forest": None,
+            "summary": None,
+            "message": "No expense data available for evaluation.",
         }
+
+    # Need the is_anomaly column for evaluation
+    if "is_anomaly" not in df.columns:
+        df["is_anomaly"] = False
+
+    labeled_count = int(df["is_anomaly"].sum())
+
+    # If no labeled anomalies, we can't compute meaningful precision/recall
+    if labeled_count == 0:
+        return {
+            "labeled_anomalies": 0,
+            "zscore": None,
+            "isolation_forest": None,
+            "summary": None,
+            "message": "No labeled anomalies in dataset. Metrics require labeled data.",
+        }
+
+    # Actually evaluate both detectors
+    zscore_results = evaluate_zscore(df, threshold=2.5)
+    if_results = evaluate_isolation_forest(df)
+
+    return {
+        "labeled_anomalies": labeled_count,
+        "zscore": zscore_results,
+        "isolation_forest": if_results,
+        "summary": {
+            "best_precision": max(zscore_results["precision"], if_results["precision"]),
+            "best_recall": max(zscore_results["recall"], if_results["recall"]),
+        },
     }

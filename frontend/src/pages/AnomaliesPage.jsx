@@ -64,8 +64,8 @@ export default function AnomaliesPage() {
                     ))}
                 </div>
             ) : (
-                <div style={{ color: "#334155", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
-                    Model not trained yet — run POST /anomaly/train
+                <div style={{ color: "#64748b", fontSize: 13, padding: 24, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24, textAlign: "center" }}>
+                    {metrics?.message || "No labeled anomaly data available. Add expenses with labeled anomalies to see model evaluation metrics."}
                 </div>
             )}
 

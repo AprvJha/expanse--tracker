@@ -49,7 +49,8 @@ async def forecast(
     response.headers["Cache-Control"] = "no-store"
     try:
         expenses = await fetch_expenses(current_user["id"])
-        return predict_next_days(expenses, days=days)
+        result = predict_next_days(expenses, days=days)
+        return result
     except ValueError as e:
         return {"error": str(e)}
 

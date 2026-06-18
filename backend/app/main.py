@@ -20,7 +20,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     await db.command("ping")
-    print("✅ MongoDB connected")
+    print("[OK] MongoDB connected")
 
     await bootstrap_models()
     load_model()
