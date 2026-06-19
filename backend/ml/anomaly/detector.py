@@ -110,6 +110,15 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
     if "is_anomaly" not in df.columns:
         df["is_anomaly"] = False
 
+    if df.shape[0] < 50:
+        return {
+            "labeled_anomalies": 0,
+            "zscore": None,
+            "isolation_forest": None,
+            "summary": None,
+            "message": f"Insufficient data for evaluation ({df.shape[0]}/50 transactions). Models need more history to accurately evaluate precision/recall.",
+        }
+
     labeled_count = int(df["is_anomaly"].sum())
 
     # If no labeled anomalies, we can't compute meaningful precision/recall
@@ -126,12 +135,21 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
     zscore_results = evaluate_zscore(df, threshold=2.5)
     if_results = evaluate_isolation_forest(df)
 
+    if zscore_results is None and if_results is None:
+        return {
+            "labeled_anomalies": labeled_count,
+            "zscore": None,
+            "isolation_forest": None,
+            "summary": None,
+            "message": "Not enough data to evaluate models. Z-score needs 5+ transactions per category, and Isolation Forest requires 50+ total transactions.",
+        }
+
     return {
         "labeled_anomalies": labeled_count,
         "zscore": zscore_results,
         "isolation_forest": if_results,
         "summary": {
-            "best_precision": max(zscore_results["precision"], if_results["precision"]),
-            "best_recall": max(zscore_results["recall"], if_results["recall"]),
+            "best_precision": max(zscore_results["precision"] if zscore_results else 0, if_results["precision"] if if_results else 0),
+            "best_recall": max(zscore_results["recall"] if zscore_results else 0, if_results["recall"] if if_results else 0),
         },
     }

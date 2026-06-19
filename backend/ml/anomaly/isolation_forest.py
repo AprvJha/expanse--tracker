@@ -132,6 +132,10 @@ def isolation_forest_detect(df: pd.DataFrame) -> pd.DataFrame:
 
 def evaluate_isolation_forest(df: pd.DataFrame) -> dict:
     """Evaluate against labeled anomalies."""
+    model, le = load_isolation_forest()
+    if model is None:
+        return None
+
     result_df = isolation_forest_detect(df)
 
     true_positives = len(result_df[

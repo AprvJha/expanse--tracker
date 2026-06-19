@@ -72,6 +72,11 @@ def evaluate_zscore(df: pd.DataFrame, threshold: float = 3.0) -> dict:
     Evaluate Z-score detector against labeled anomalies.
     Returns precision, recall, f1.
     """
+    stats = compute_category_stats(df)
+    has_valid_category = any(s["count"] >= 5 for s in stats.values())
+    if not has_valid_category:
+        return None
+
     result_df = zscore_detect(df, threshold)
 
     true_positives = len(result_df[
