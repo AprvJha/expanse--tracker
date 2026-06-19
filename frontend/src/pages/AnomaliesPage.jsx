@@ -68,9 +68,13 @@ export default function AnomaliesPage() {
                 <div style={{ color: "#475569", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
                     No labeled anomalies in this account's data yet — precision/recall require known ground truth to evaluate against. Detection still runs on all transactions below.
                 </div>
+            ) : metrics?.message ? (
+                <div style={{ color: "#475569", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
+                    {metrics.message}
+                </div>
             ) : (
                 <div style={{ color: "#334155", fontSize: 13, padding: 20, background: "#0d1117", borderRadius: 8, border: "1px solid #1e2d3d", marginBottom: 24 }}>
-                    Model not trained yet — run POST /anomaly/train
+                    No expense data available for evaluation.
                 </div>
             )}
 
