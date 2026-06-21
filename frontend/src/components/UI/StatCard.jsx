@@ -1,4 +1,3 @@
-// frontend/src/components/UI/StatCard.jsx
 export default function StatCard({ label, value, sub, color = "#00ff9d" }) {
     return (
         <div style={{

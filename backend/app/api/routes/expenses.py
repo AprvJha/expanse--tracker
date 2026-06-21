@@ -1,19 +1,14 @@
-# backend/app/api/routes/expenses.py
-from fastapi import APIRouter, HTTPException, Query, Depends   # ← add Depends
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 from app.services import expense_service
-from app.api.routes.auth import get_current_user              # ← add this import
+from app.api.routes.auth import get_current_user
 from app.schemas.expanse import ExpenseCreate, ExpenseUpdate
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 
-# ── Remove this line ──────────────────────────────────
-# TEMP_USER_ID = "sample_user_001"   ← DELETE THIS
 
-
-# ── Routes (add Depends to each) ──────────────────────
 @router.get("/")
 async def list_expenses(
     page: int = Query(default=1, ge=1),
@@ -22,10 +17,10 @@ async def list_expenses(
     start_date: Optional[datetime] = Query(default=None),
     end_date: Optional[datetime] = Query(default=None),
     source: Optional[str] = Query(default=None),
-    current_user: dict = Depends(get_current_user),           # ← add this
+    current_user: dict = Depends(get_current_user),
 ):
     return await expense_service.get_expenses(
-        user_id=current_user["id"],                           # ← use real user id
+        user_id=current_user["id"],
         page=page,
         limit=limit,
         category=category,

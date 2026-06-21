@@ -217,7 +217,6 @@ export default function Roadmap() {
       fontFamily: "'DM Mono', 'Courier New', monospace",
       padding: "0",
     }}>
-      {/* Scan line overlay */}
       <div style={{
         position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0,
         backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,157,0.015) 2px, rgba(0,255,157,0.015) 4px)",
@@ -225,7 +224,6 @@ export default function Roadmap() {
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
 
-        {/* Header */}
         <div style={{ marginBottom: 48 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
             <div style={{ width: 8, height: 8, background: "#00ff9d", borderRadius: "50%", boxShadow: "0 0 8px #00ff9d" }} />
@@ -244,7 +242,6 @@ export default function Roadmap() {
           </p>
         </div>
 
-        {/* Stack + Metrics row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 40 }}>
           <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 20 }}>
             <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 14, textTransform: "uppercase" }}>Tech Stack</div>
@@ -269,7 +266,6 @@ export default function Roadmap() {
           </div>
         </div>
 
-        {/* Phase Timeline */}
         <div style={{ fontSize: 10, letterSpacing: "0.15em", color: "#475569", marginBottom: 16, textTransform: "uppercase" }}>
           Click a phase to expand
         </div>
@@ -289,7 +285,6 @@ export default function Roadmap() {
                   boxShadow: isOpen ? `0 0 20px ${phase.accent}18` : "none",
                 }}
               >
-                {/* Phase Header Row */}
                 <div style={{ display: "flex", alignItems: "center", padding: "16px 20px", gap: 16 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: 4, border: `1px solid ${phase.accent}`,
@@ -318,12 +313,10 @@ export default function Roadmap() {
                   <div style={{ color: "#334155", fontSize: 14, transform: isOpen ? "rotate(180deg)" : "none", transition: "0.2s" }}>▾</div>
                 </div>
 
-                {/* Expanded Content */}
                 {isOpen && (
                   <div style={{ padding: "0 20px 20px" }}>
                     <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 20px", paddingTop: 0 }}>{phase.description}</p>
 
-                    {/* Architecture Table */}
                     <div style={{ marginBottom: 20 }}>
                       <div style={{ fontSize: 10, letterSpacing: "0.12em", color: "#334155", marginBottom: 10, textTransform: "uppercase" }}>Architecture</div>
                       <div style={{ background: "#060a0f", border: "1px solid #1a2332", borderRadius: 6, overflow: "hidden" }}>
@@ -342,7 +335,6 @@ export default function Roadmap() {
                       </div>
                     </div>
 
-                    {/* Tabs */}
                     <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
                       {["deliverables", "interview", "resume"].map(tab => (
                         <button key={tab} onClick={(e) => { e.stopPropagation(); setActiveTab(tab); }} style={{
@@ -415,7 +407,6 @@ export default function Roadmap() {
           })}
         </div>
 
-        {/* Summary footer */}
         <div style={{
           background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8,
           padding: "20px 24px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20,

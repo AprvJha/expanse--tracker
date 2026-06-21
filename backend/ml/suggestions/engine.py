@@ -1,4 +1,3 @@
-# backend/ml/suggestions/engine.py
 from ml.insights.patterns import (
     to_dataframe,
     category_concentration,
@@ -20,7 +19,7 @@ SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2, "info": 3}
 
 def generate_suggestions(expenses: list[dict]) -> list[dict]:
     """
-    Orchestrates Phase 3, 4, 5 outputs into a unified list
+    Orchestrates insights, anomaly detection, and predictions into a unified list
     of actionable, rule-based suggestions.
     """
     df = to_dataframe(expenses)
@@ -29,7 +28,6 @@ def generate_suggestions(expenses: list[dict]) -> list[dict]:
 
     suggestions = []
 
-    # ── Category concentration (Phase 3) ──────────────
     concentration = category_concentration(df)
     if concentration:
         category_totals = concentration.get("category_totals", {})
@@ -43,20 +41,17 @@ def generate_suggestions(expenses: list[dict]) -> list[dict]:
         if diversification:
             suggestions.append(diversification)
 
-    # ── Recurring expenses (Phase 3) ──────────────────
     recurring = recurring_expenses(df)
     sub_audit = subscription_audit(recurring)
     if sub_audit:
         suggestions.append(sub_audit)
 
-    # ── Anomalies (Phase 4) ────────────────────────────
     try:
         alerts = detect_anomalies(expenses)
         suggestions += anomaly_followups(alerts)
     except Exception:
-        pass  # detector not ready — skip gracefully
+        pass
 
-    # ── Forecast (Phase 5) ──────────────────────────────
     try:
         from ml.prediction.predictor import predict_next_days
         forecast = predict_next_days(expenses, days=30)

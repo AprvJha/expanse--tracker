@@ -14,18 +14,15 @@ async def upload_csv(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    # Validate file type
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted")
 
-    # Read file content
     content = await file.read()
     try:
         text = content.decode("utf-8")
     except UnicodeDecodeError:
-        text = content.decode("latin-1")  # fallback for some bank exports
+        text = content.decode("latin-1")
 
-    # Parse + clean
     try:
         records, stats = parse_csv(text)
     except ValueError as e:
@@ -37,18 +34,15 @@ async def upload_csv(
             detail="No valid transactions found after cleaning."
         )
 
-    # Add metadata to each record
     db = get_database()
     user_id = current_user["id"]
 
-    # Calculate average for simple anomaly detection
     amounts = [float(r["amount"]) for r in records]
     avg_amount = sum(amounts) / len(amounts) if amounts else 0
 
     documents = []
     for record in records:
         amount = float(record["amount"])
-        # Simple rule: flag if > 5x the average of the batch
         is_anomaly = amount > (avg_amount * 5) and amount > 1000 
         
         documents.append({
@@ -64,7 +58,6 @@ async def upload_csv(
             "created_at": datetime.now(),
         })
 
-    # Insert into MongoDB
     result = await db["expenses"].insert_many(documents)
 
     return {

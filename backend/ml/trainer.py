@@ -64,28 +64,24 @@ async def train():
         print("❌ Not enough data to train. Need at least 50 labeled transactions.")
         return
 
-    # Prepare features and labels
     X = [doc["merchant"] for doc in data]
     y = [doc["category"] for doc in data]
 
-    # Train/test split (80/20)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
     print(f"Train: {len(X_train)} | Test: {len(X_test)}")
 
-    # ── Tier 1: Keyword baseline evaluation ───────────
     print("\nEvaluating keyword baseline...")
     baseline_accuracy = evaluate_keyword_baseline(X_test, y_test)
     print(f"Keyword Baseline Accuracy: {baseline_accuracy:.1%}")
 
-    # ── Tier 2: TF-IDF + Logistic Regression ──────────
     print("\nTraining TF-IDF + Logistic Regression model...")
 
     pipeline = Pipeline([
         ("tfidf", TfidfVectorizer(
-            analyzer="char_wb",   # character n-grams (great for merchant names)
-            ngram_range=(2, 4),   # bigrams to 4-grams
+            analyzer="char_wb",
+            ngram_range=(2, 4),
             max_features=5000,
             lowercase=True,
         )),
@@ -102,18 +98,15 @@ async def train():
 
     print(f"ML Model Accuracy:         {ml_accuracy:.1%}")
 
-    # ── Comparison ────────────────────────────────────
-    print("\n── Accuracy Comparison ──────────────────")
+    print("\n── Accuracy Comparison ────────────────────")
     print(f"  Keyword Baseline:  {baseline_accuracy:.1%}")
     print(f"  ML Model:          {ml_accuracy:.1%}")
     print(f"  Improvement:       +{(ml_accuracy - baseline_accuracy):.1%}")
     print("─────────────────────────────────────────")
 
-    # ── Full classification report ────────────────────
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
 
-    # ── Save model ────────────────────────────────────
     model_data = {
         "pipeline": pipeline,
         "baseline_accuracy": baseline_accuracy,

@@ -1,4 +1,3 @@
-// frontend/src/pages/ExpensesPage.jsx
 import { useEffect, useState } from "react";
 import { expensesAPI } from "../services/api";
 import { formatCurrency, formatDate, CATEGORY_COLORS } from "../utils/formatters";
@@ -48,9 +47,7 @@ export default function ExpensesPage() {
                 </div>
             </div>
 
-            {/* Table */}
             <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, overflow: "hidden" }}>
-                {/* Header */}
                 <div style={{
                     display: "grid", gridTemplateColumns: "1fr 120px 140px 120px",
                     padding: "12px 20px", background: "#090d12",
@@ -63,7 +60,6 @@ export default function ExpensesPage() {
                     ))}
                 </div>
 
-                {/* Rows */}
                 {loading ? (
                     <div style={{ padding: 40, textAlign: "center", color: "#475569" }}>Loading...</div>
                 ) : expenses.map((exp) => (
@@ -99,7 +95,6 @@ export default function ExpensesPage() {
                 ))}
             </div>
 
-            {/* Pagination */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
                 <span style={{ fontSize: 12, color: "#475569" }}>
                     {pagination.total} total · Page {pagination.page} of {pagination.pages}

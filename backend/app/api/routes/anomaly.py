@@ -1,4 +1,3 @@
-# backend/app/api/routes/anomaly.py
 from fastapi import APIRouter, Depends, Response
 from app.api.routes.auth import get_current_user
 from app.core.database import get_database
@@ -44,7 +43,6 @@ async def anomaly_metrics(response: Response, current_user: dict = Depends(get_c
     """
     Evaluate detection accuracy against labeled anomalies.
     Returns precision/recall/f1 for Z-score and Isolation Forest.
-    THIS is what you show in interviews.
     """
     response.headers["Cache-Control"] = "no-store"
     expenses = await fetch_expenses(current_user["id"])
@@ -59,8 +57,8 @@ async def train_model(current_user: dict = Depends(get_current_user)):
         expenses = await fetch_expenses(current_user["id"])
         df = to_dataframe(expenses)
 
-        print(f"Training on {len(df)} expenses")  # debug log
-        print(f"Columns: {df.columns.tolist()}")  # debug log
+        print(f"Training on {len(df)} expenses")
+        print(f"Columns: {df.columns.tolist()}")
 
         if len(df) < 50:
             return {"error": f"Need at least 50 transactions, found {len(df)}"}
@@ -72,5 +70,5 @@ async def train_model(current_user: dict = Depends(get_current_user)):
         }
     except Exception as e:
         import traceback
-        traceback.print_exc()  # prints full error to terminal
+        traceback.print_exc()
         return {"error": str(e)}

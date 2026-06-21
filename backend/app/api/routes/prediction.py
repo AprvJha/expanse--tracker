@@ -1,4 +1,3 @@
-# backend/app/api/routes/prediction.py
 from fastapi import APIRouter, Depends, Query, Response
 from app.api.routes.auth import get_current_user
 from app.core.database import get_database

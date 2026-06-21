@@ -10,20 +10,18 @@ sys.path.append(BASE_DIR)
 from motor.motor_asyncio import AsyncIOMotorClient
 
 MONGODB_URL = os.getenv("MONGODB_URL")
-NEW_USER_ID = "6a008f4e5103a259e00d84d3"  # mltest@test.com
+NEW_USER_ID = "6a008f4e5103a259e00d84d3"
 
 async def main():
     client = AsyncIOMotorClient(MONGODB_URL)
     db = client["expense_db"]
 
-    # Reassign all expenses from old user to new user
     result = await db["expenses"].update_many(
         {"user_id": "69fc6462acc4b24f3c15fbb6"},
         {"$set": {"user_id": NEW_USER_ID}}
     )
     print(f"Reassigned {result.modified_count} transactions to mltest@test.com")
 
-    # Also reassign the other batches
     result2 = await db["expenses"].update_many(
         {"user_id": "690c9cd71d7260496c4b7222"},
         {"$set": {"user_id": NEW_USER_ID}}
@@ -36,7 +34,6 @@ async def main():
     )
     print(f"Reassigned {result3.modified_count} additional transactions")
 
-    # Verify
     count = await db["expenses"].count_documents({"user_id": NEW_USER_ID})
     print(f"Total transactions for mltest@test.com: {count}")
 

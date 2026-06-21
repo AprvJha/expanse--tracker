@@ -1,4 +1,3 @@
-# backend/app/services/csv_parser.py
 import pandas as pd
 from io import StringIO
 from app.services.data_cleaner import clean_data
@@ -61,11 +60,9 @@ def parse_csv(content: str) -> tuple[list[dict], dict]:
     except Exception as e:
         raise ValueError(f"Could not read CSV: {str(e)}")
 
-    # Detect format + rename columns
     fmt = detect_format(df)
     column_map = COLUMN_MAPS[fmt]
 
-    # Only keep columns we care about
     available_cols = {k: v for k, v in column_map.items() if k in df.columns}
     if len(available_cols) < 2:
         raise ValueError(
@@ -76,14 +73,11 @@ def parse_csv(content: str) -> tuple[list[dict], dict]:
 
     df = df.rename(columns=available_cols)
 
-    # Keep only our 3 core columns
     core_cols = [c for c in ["date", "merchant", "amount"] if c in df.columns]
     df = df[core_cols]
 
-    # Clean the data
     df, stats = clean_data(df)
     stats["format_detected"] = fmt
 
-    # Convert to list of dicts
     records = df.to_dict("records")
     return records, stats

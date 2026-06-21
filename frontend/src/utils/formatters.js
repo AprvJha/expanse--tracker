@@ -1,4 +1,3 @@
-// frontend/src/utils/formatters.js
 export const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
         style: "currency",

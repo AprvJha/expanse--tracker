@@ -1,4 +1,3 @@
-# backend/app/services/auth_service.py
 from datetime import datetime
 from app.core.database import get_database
 from app.core.security import hash_password, verify_password, create_access_token
@@ -12,12 +11,10 @@ async def register_user(email: str, password: str, name: str) -> dict:
     Register a new user.
     Raises ValueError if email already exists.
     """
-    # Check if email already taken
     existing = await users_collection.find_one({"email": email})
     if existing:
         raise ValueError("Email already registered")
 
-    # Create user document
     user = {
         "email": email.lower().strip(),
         "name": name.strip(),
@@ -47,7 +44,6 @@ async def login_user(email: str, password: str) -> dict:
     if not verify_password(password, user["password"]):
         raise ValueError("Invalid email or password")
 
-    # Create JWT token
     token = create_access_token(data={
         "sub": str(user["_id"]),
         "email": user["email"],

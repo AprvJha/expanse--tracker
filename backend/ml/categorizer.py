@@ -1,4 +1,3 @@
-# Keyword map — merchant name → category
 KEYWORD_MAP = {
     "Food": [
         "swiggy", "zomato", "dominos", "domino", "mcdonalds", "mcdonald",

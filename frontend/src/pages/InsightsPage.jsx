@@ -1,4 +1,3 @@
-// frontend/src/pages/InsightsPage.jsx
 import { useEffect, useState } from "react";
 import { insightsAPI, suggestionsAPI } from "../services/api";
 import { SEVERITY_COLORS } from "../utils/formatters";
@@ -36,7 +35,6 @@ export default function InsightsPage() {
                 Behavioral patterns and data-driven recommendations
             </p>
 
-            {/* Behavioral Insights */}
             <div style={{ marginBottom: 40 }}>
                 <div style={{ fontSize: 11, color: "#475569", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
                     Behavioral Insights ({insights.length})
@@ -69,7 +67,6 @@ export default function InsightsPage() {
                 )}
             </div>
 
-            {/* Suggestions */}
             <div>
                 <div style={{ fontSize: 11, color: "#475569", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
                     Suggestions ({suggestions.length})

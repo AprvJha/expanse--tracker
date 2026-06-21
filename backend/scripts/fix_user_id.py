@@ -18,18 +18,15 @@ async def main():
     client = AsyncIOMotorClient(MONGODB_URL)
     db = client["expense_db"]
 
-    # Count before
     before = await db["expenses"].count_documents({"user_id": WRONG_USER_ID})
     print(f"Found {before} transactions under wrong user ID")
 
-    # Reassign
     result = await db["expenses"].update_many(
         {"user_id": WRONG_USER_ID},
         {"$set": {"user_id": CORRECT_USER_ID}}
     )
     print(f"✅ Reassigned {result.modified_count} transactions to correct user")
 
-    # Verify
     after = await db["expenses"].count_documents({"user_id": CORRECT_USER_ID})
     print(f"Total transactions for correct user: {after}")
 

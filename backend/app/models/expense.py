@@ -1,4 +1,3 @@
-# backend/app/models/expense.py
 from bson import ObjectId
 from datetime import datetime
 

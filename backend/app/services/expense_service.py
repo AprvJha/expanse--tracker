@@ -1,4 +1,3 @@
-# backend/app/services/expense_service.py
 from bson import ObjectId
 from datetime import datetime
 from app.core.database import get_database
@@ -22,7 +21,6 @@ async def get_expenses(
     Fetch expenses with filters + pagination.
     Returns data + pagination metadata.
     """
-    # Build filter query
     query = {"user_id": user_id}
 
     if category:
@@ -38,10 +36,8 @@ async def get_expenses(
         if end_date:
             query["date"]["$lte"] = end_date
 
-    # Count total matching documents
     total = await collection.count_documents(query)
 
-    # Fetch paginated results sorted by date descending
     skip = (page - 1) * limit
     cursor = collection.find(query).sort("date", -1).skip(skip).limit(limit)
     expenses = await cursor.to_list(length=limit)
@@ -90,7 +86,6 @@ async def create_expense(user_id: str, data: dict) -> dict:
 
 async def update_expense(expense_id: str, user_id: str, data: dict) -> dict | None:
     """Update an existing expense. Only updates fields that are provided."""
-    # Remove None values so we don't overwrite with null
     updates = {k: v for k, v in data.items() if v is not None}
 
     if not updates:
@@ -147,11 +142,9 @@ async def get_summary(user_id: str) -> dict:
             "avg": round(doc["avg"], 2),
         })
 
-    # Total across all categories
     total_spent = sum(c["total"] for c in category_breakdown)
     total_transactions = sum(c["count"] for c in category_breakdown)
 
-    # Monthly breakdown (last 6 months)
     monthly_pipeline = [
         {"$match": {"user_id": user_id}},
         {"$group": {

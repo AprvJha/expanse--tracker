@@ -1,4 +1,3 @@
-// frontend/src/services/api.js
 import axios from "axios";
 
 const api = axios.create({
@@ -6,7 +5,7 @@ const api = axios.create({
     headers: { "Content-Type": "application/json" },
 });
 
-// Attach token to every request automatically
+// Attach token to every request
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -27,14 +26,14 @@ api.interceptors.response.use(
     }
 );
 
-// ── Auth ──────────────────────────────────────────────
+// Auth
 export const authAPI = {
     register: (data) => api.post("/auth/register", data),
     login: (data) => api.post("/auth/login", data),
     me: () => api.get("/auth/me"),
 };
 
-// ── Expenses ──────────────────────────────────────────
+// Expenses
 export const expensesAPI = {
     list: (params) => api.get("/expenses/", { params }),
     summary: () => api.get("/expenses/summary"),
@@ -43,7 +42,7 @@ export const expensesAPI = {
     delete: (id) => api.delete(`/expenses/${id}`),
 };
 
-// ── Upload ────────────────────────────────────────────
+// Upload
 export const uploadAPI = {
     csv: (file) => {
         const formData = new FormData();
@@ -53,27 +52,27 @@ export const uploadAPI = {
         });
     },
 };
-// ── Insights (Phase 3) ────────────────────────────────
+// Insights
 export const insightsAPI = {
     list: () => api.get("/insights/"),
     full: () => api.get("/insights/full"),
 };
 
-// ── Anomaly Detection (Phase 4) ───────────────────────
+// Anomaly Detection
 export const anomalyAPI = {
     detect: () => api.get("/anomaly/detect"),
     metrics: () => api.get("/anomaly/metrics"),
     train: () => api.post("/anomaly/train"),
 };
 
-// ── Prediction (Phase 5) ───────────────────────────────
+// Prediction
 export const predictionAPI = {
     forecast: (days) => api.get(`/prediction/forecast?days=${days}`),
     metrics: () => api.get("/prediction/metrics"),
     train: () => api.post("/prediction/train"),
 };
 
-// ── Suggestions (Phase 6) ──────────────────────────────
+// Suggestions
 export const suggestionsAPI = {
     list: () => api.get("/suggestions/"),
 };

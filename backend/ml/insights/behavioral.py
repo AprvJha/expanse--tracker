@@ -1,4 +1,3 @@
-# backend/ml/insights/behavioral.py
 from ml.insights.patterns import (
     to_dataframe,
     weekend_vs_weekday,
@@ -22,7 +21,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
 
     insights = []
 
-    # ── 1. Weekend vs Weekday ─────────────────────────
     ww = weekend_vs_weekday(df)
     if ww and ww["ratio"] > 1.2:
         insights.append({
@@ -33,7 +31,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
             "data": ww,
         })
 
-    # ── 2. Category Concentration ─────────────────────
     cc = category_concentration(df)
     if cc and cc["top3_percentage"] > 60:
         top3 = ", ".join(cc["top3_categories"])
@@ -45,7 +42,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
             "data": cc,
         })
 
-    # ── 3. Dominant Category ──────────────────────────
     if cc and cc["top1_percentage"] > 35:
         insights.append({
             "type": "dominant_category",
@@ -55,7 +51,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
             "data": {"category": cc["top1_category"], "percentage": cc["top1_percentage"]},
         })
 
-    # ── 4. Merchant Frequency ─────────────────────────
     freq = merchant_frequency(df)
     for merchant_data in freq[:2]:
         if merchant_data["change_pct"] > 30:
@@ -67,7 +62,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
                 "data": merchant_data,
             })
 
-    # ── 5. Recurring Expenses ─────────────────────────
     recurring = recurring_expenses(df)
     if recurring:
         total_recurring = sum(r["amount"] for r in recurring)
@@ -80,7 +74,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
             "data": {"recurring": recurring, "total": total_recurring},
         })
 
-    # ── 6. Highest Spend Month ────────────────────────
     monthly = highest_spend_month(df)
     if monthly and monthly["current_month_rank"] == 1:
         insights.append({
@@ -91,7 +84,6 @@ def generate_insights(expenses: list[dict]) -> list[dict]:
             "data": monthly,
         })
 
-    # ── 7. Monthly Trend ──────────────────────────────
     trend = monthly_trend(df)
     if len(trend) >= 2:
         last = trend[-1]["total"]

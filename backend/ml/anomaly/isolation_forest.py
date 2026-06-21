@@ -1,4 +1,3 @@
-# backend/ml/anomaly/isolation_forest.py
 import numpy as np
 import pandas as pd
 import joblib
@@ -20,19 +19,15 @@ def build_features(df: pd.DataFrame) -> np.ndarray:
     df = df.copy()
     df["date"] = pd.to_datetime(df["date"])
 
-    # Encode category
     le = LabelEncoder()
     df["category_encoded"] = le.fit_transform(df["category"].astype(str))
 
-    # Time features
     df["day_of_week"] = df["date"].dt.dayofweek
     df["day_of_month"] = df["date"].dt.day
     df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
 
-    # Log transform amount
     df["log_amount"] = np.log1p(df["amount"])
 
-    # Amount relative to category mean (KEY NEW FEATURE)
     category_means = df.groupby("category")["amount"].transform("mean")
     category_stds = df.groupby("category")["amount"].transform("std").fillna(1)
     df["amount_vs_category"] = (df["amount"] - category_means) / category_stds
@@ -65,7 +60,6 @@ def train_isolation_forest(df: pd.DataFrame, contamination: float = 0.01):
     )
     model.fit(features)
 
-    # Save model + encoder
     joblib.dump({"model": model, "encoder": le}, MODEL_PATH)
     print(f"[SUCCESS] Isolation Forest saved to {MODEL_PATH}")
 
@@ -93,7 +87,6 @@ def isolation_forest_detect(df: pd.DataFrame) -> pd.DataFrame:
         df["anomaly_score"] = 0.0
         return df
 
-    # Build features using saved encoder
     df["category_encoded"] = 0
     try:
         df["category_encoded"] = le.transform(df["category"].astype(str))
@@ -105,7 +98,6 @@ def isolation_forest_detect(df: pd.DataFrame) -> pd.DataFrame:
     df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
     df["log_amount"] = np.log1p(df["amount"])
 
-    # Amount vs category mean
     category_means = df.groupby("category")["amount"].transform("mean")
     category_stds = df.groupby("category")["amount"].transform("std").fillna(1)
     df["amount_vs_category"] = (df["amount"] - category_means) / category_stds
@@ -120,7 +112,6 @@ def isolation_forest_detect(df: pd.DataFrame) -> pd.DataFrame:
     ]].fillna(0)
     features = feature_df.values
 
-    # -1 = anomaly, 1 = normal
     predictions = model.predict(features)
     scores = model.score_samples(features)
 

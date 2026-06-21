@@ -1,4 +1,3 @@
-# backend/ml/bootstrap.py
 import os
 from app.core.database import get_database
 

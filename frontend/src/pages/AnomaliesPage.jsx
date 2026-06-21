@@ -1,4 +1,3 @@
-// frontend/src/pages/AnomaliesPage.jsx
 import { useEffect, useState } from "react";
 import { anomalyAPI } from "../services/api";
 import { formatCurrency, SEVERITY_COLORS } from "../utils/formatters";
@@ -31,7 +30,6 @@ export default function AnomaliesPage() {
                 Two-tier detection: Z-score + Isolation Forest, evaluated on labeled test data
             </p>
 
-            {/* Model metrics */}
             {hasMetrics && hasLabeledData ? (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
                     {[
@@ -78,7 +76,6 @@ export default function AnomaliesPage() {
                 </div>
             )}
 
-            {/* Summary stats */}
             {detection && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
                     {[
@@ -95,7 +92,6 @@ export default function AnomaliesPage() {
                 </div>
             )}
 
-            {/* Anomaly table */}
             <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, overflow: "hidden" }}>
                 <div style={{
                     display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 100px 2fr",

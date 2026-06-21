@@ -1,4 +1,3 @@
-# backend/ml/suggestions/rules.py
 from ml.suggestions.benchmarks import (
     CATEGORY_BENCHMARKS,
     DEFAULT_BENCHMARK,
@@ -179,8 +178,6 @@ def forecast_alert(forecast: dict, trend: list[dict]) -> dict | None:
 
     predicted_total = forecast.get("total_predicted", 0)
 
-    # Use second-to-last month as baseline if available —
-    # the last entry is often the current, partial month
     if len(trend) >= 2:
         previous_total = trend[-2]["total"]
     else:

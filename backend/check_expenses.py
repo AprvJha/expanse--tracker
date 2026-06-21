@@ -11,7 +11,6 @@ async def main():
         c = await db["expenses"].count_documents({"user_id": uid})
         print(f"User {user['email']} ({uid}) has {c} expenses")
         
-    # Find all distinct user_ids in expenses
     pipeline = [{"$group": {"_id": "$user_id", "count": {"$sum": 1}}}]
     cursor = db["expenses"].aggregate(pipeline)
     async for doc in cursor:

@@ -1,4 +1,3 @@
-# backend/ml/anomaly/detector.py
 import pandas as pd
 import numpy as np
 import asyncio
@@ -29,29 +28,22 @@ def detect_anomalies(expenses: list[dict]) -> list[dict]:
     if df.empty:
         return []
 
-    # Add is_anomaly column if missing
     if "is_anomaly" not in df.columns:
         df["is_anomaly"] = False
 
-    # Run both detectors
     df = zscore_detect(df, threshold=3.0)
     df = isolation_forest_detect(df)
 
-    # NEW — high confidence: both detectors agree
     df["detected_high"] = df["zscore_anomaly"] & df["if_anomaly"]
 
-    # Medium confidence: either detector fires
     df["detected_medium"] = df["zscore_anomaly"] | df["if_anomaly"]
 
-    # Use high confidence as primary
     df["detected"] = df["detected_high"]
 
-    # Build alert list
     alerts = []
     flagged = df[df["detected"]].copy()
 
     for _, row in flagged.iterrows():
-        # Determine severity
         if row.get("zscore", 0) > 3.5 or row.get("anomaly_score", 0) > 0.6:
             severity = "high"
         elif row.get("zscore", 0) > 2.5 or row.get("anomaly_score", 0) > 0.4:
@@ -59,7 +51,6 @@ def detect_anomalies(expenses: list[dict]) -> list[dict]:
         else:
             severity = "low"
 
-        # Detection method
         methods = []
         if row.get("zscore_anomaly"):
             methods.append("z-score")
@@ -82,7 +73,6 @@ def detect_anomalies(expenses: list[dict]) -> list[dict]:
             "is_labeled_anomaly": bool(row.get("is_anomaly", False)),
         })
 
-    # Sort by severity
     severity_order = {"high": 0, "medium": 1, "low": 2}
     alerts.sort(key=lambda x: severity_order[x["severity"]])
 
@@ -96,7 +86,6 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
     """
     df = to_dataframe(expenses)
 
-    # No data = no metrics to show
     if df.empty:
         return {
             "labeled_anomalies": 0,
@@ -106,7 +95,6 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
             "message": "No expense data available for evaluation.",
         }
 
-    # Need the is_anomaly column for evaluation
     if "is_anomaly" not in df.columns:
         df["is_anomaly"] = False
 
@@ -121,7 +109,6 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
 
     labeled_count = int(df["is_anomaly"].sum())
 
-    # If no labeled anomalies, we can't compute meaningful precision/recall
     if labeled_count == 0:
         return {
             "labeled_anomalies": 0,
@@ -131,7 +118,6 @@ def get_anomaly_metrics(expenses: list[dict]) -> dict:
             "message": "No labeled anomalies in dataset. Metrics require labeled data.",
         }
 
-    # Actually evaluate both detectors
     zscore_results = evaluate_zscore(df, threshold=2.5)
     if_results = evaluate_isolation_forest(df)
 

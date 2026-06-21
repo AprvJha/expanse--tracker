@@ -1,4 +1,3 @@
-# backend/app/api/routes/auth.py
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
@@ -9,7 +8,6 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 security = HTTPBearer()
 
 
-# ── Request schemas ────────────────────────────────────
 class RegisterRequest(BaseModel):
     name: str
     email: str
@@ -21,7 +19,6 @@ class LoginRequest(BaseModel):
     password: str
 
 
-# ── Dependency — reuse this in protected routes ────────
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> dict:
@@ -42,7 +39,6 @@ async def get_current_user(
     return user
 
 
-# ── Routes ────────────────────────────────────────────
 @router.post("/register", status_code=201)
 async def register(data: RegisterRequest):
     """Register a new user."""

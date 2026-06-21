@@ -1,4 +1,3 @@
-// frontend/src/pages/UploadPage.jsx
 import { useState, useRef } from "react";
 import { uploadAPI } from "../services/api";
 
@@ -42,7 +41,6 @@ export default function UploadPage() {
                 Supports HDFC, SBI, Paytm, ICICI, and generic formats.
             </p>
 
-            {/* Drop zone */}
             <div
                 onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                 onDragLeave={() => setDragging(false)}
@@ -101,7 +99,6 @@ export default function UploadPage() {
                 </button>
             )}
 
-            {/* Result */}
             {result && (
                 <div style={{
                     marginTop: 24, background: "#0d1117",

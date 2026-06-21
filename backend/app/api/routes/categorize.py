@@ -1,4 +1,3 @@
-# backend/app/api/routes/categorize.py
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional

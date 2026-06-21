@@ -13,7 +13,6 @@ def separator(title):
     print(f"  {title}")
     print(f"{'='*60}")
 
-# ── Step 1: Login to get a dynamic JWT token ──────────────
 separator("STEP 1: Authenticating with credentials")
 login_payload = {
     "email": "apoorvjha11@gmail.com",
@@ -33,7 +32,6 @@ except Exception as e:
     sys.exit(1)
 
 
-# ── Test 0: Health check ──────────────────────────────────
 separator("TEST 0: Health Check")
 r = requests.get(f"{BASE}/health")
 print(f"Status: {r.status_code}")
@@ -42,7 +40,6 @@ assert r.status_code == 200, "Health check failed"
 print("[PASS] Health check passed")
 
 
-# ── Test 1: POST /anomaly/train ───────────────────────────
 separator("TEST 1: POST /anomaly/train")
 r = requests.post(f"{BASE}/anomaly/train", headers=HEADERS)
 print(f"Status: {r.status_code}")
@@ -55,7 +52,6 @@ assert "trained_on" in data, "Missing 'trained_on' field"
 print(f"[PASS] Train endpoint passed - trained on {data['trained_on']} records")
 
 
-# ── Test 2: GET /anomaly/detect ───────────────────────────
 separator("TEST 2: GET /anomaly/detect")
 r = requests.get(f"{BASE}/anomaly/detect", headers=HEADERS)
 print(f"Status: {r.status_code}")
@@ -80,7 +76,6 @@ if data["anomalies_detected"] > 0:
 print(f"[PASS] Detect endpoint passed - {data['anomalies_detected']} anomalies in {data['total_transactions']} txns")
 
 
-# ── Test 3: GET /anomaly/metrics ──────────────────────────
 separator("TEST 3: GET /anomaly/metrics")
 r = requests.get(f"{BASE}/anomaly/metrics", headers=HEADERS)
 print(f"Status: {r.status_code}")
@@ -91,7 +86,6 @@ assert r.status_code == 200, f"Expected 200, got {r.status_code}"
 print("[PASS] Metrics endpoint passed")
 
 
-# ── Test 4: POST /anomaly/train without auth ──────────────
 separator("TEST 4: POST /anomaly/train (no auth - should fail)")
 r = requests.post(f"{BASE}/anomaly/train")
 print(f"Status: {r.status_code}")
@@ -100,7 +94,6 @@ assert r.status_code in [401, 403], f"Expected 401 or 403, got {r.status_code}"
 print("[PASS] Auth guard works - unauthenticated request rejected")
 
 
-# ── Summary ───────────────────────────────────────────────
 separator("ALL TESTS PASSED")
 print(f"""
 [PASS] Health check          - 200 OK

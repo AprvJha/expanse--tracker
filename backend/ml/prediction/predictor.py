@@ -1,4 +1,3 @@
-# backend/ml/prediction/predictor.py
 import pandas as pd
 import numpy as np
 import joblib
@@ -29,41 +28,34 @@ def train_predictor(expenses: list[dict]) -> dict:
     if len(daily) < 30:
         raise ValueError("Need at least 30 days of data to train")
 
-    # Drop rows with NaN features
     daily = daily.dropna(subset=FEATURE_COLS)
 
     X = daily[FEATURE_COLS].values
     y = daily["total"].values
 
-    # 80/20 split — keep time order (don't shuffle)
     split = int(len(X) * 0.8)
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
 
-    # Scale features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # Train Linear Regression
     model = LinearRegression()
     model.fit(X_train_scaled, y_train)
 
-    # Evaluate
     y_pred = model.predict(X_test_scaled)
-    y_pred = np.maximum(y_pred, 0)  # no negative predictions
+    y_pred = np.maximum(y_pred, 0)
 
     mae = float(np.mean(np.abs(y_test - y_pred)))
     rmse = float(np.sqrt(np.mean((y_test - y_pred) ** 2)))
     avg_spend = float(np.mean(y_test))
     mae_pct = (mae / avg_spend * 100) if avg_spend > 0 else 0
 
-    # Rolling average baseline (naive comparison)
     rolling_pred = daily["rolling_7d"].values[split:]
     baseline_mae = float(np.mean(np.abs(y_test - rolling_pred)))
     baseline_mae_pct = (baseline_mae / avg_spend * 100) if avg_spend > 0 else 0
 
-    # Save model
     joblib.dump({
         "model": model,
         "scaler": scaler,
@@ -99,7 +91,6 @@ def predict_next_days(expenses: list[dict], days: int = 30) -> dict:
     Predict spend for next N days.
     Returns daily predictions + total.
     """
-    # No expenses = nothing to predict
     if not expenses:
         return {
             "days": days,
@@ -116,13 +107,11 @@ def predict_next_days(expenses: list[dict], days: int = 30) -> dict:
     model = model_data["model"]
     scaler = model_data["scaler"]
 
-    # Build daily features from existing expenses to get rolling averages
     daily = build_daily_features(expenses)
 
     if daily.empty or len(daily) < 7:
         raise ValueError("Need at least 7 days of data to forecast.")
 
-    # Use the last row's rolling stats as baseline for future predictions
     last_row = daily.iloc[-1]
     rolling_7d = last_row.get("rolling_7d", 0) or 0
     rolling_30d = last_row.get("rolling_30d", 0) or 0
@@ -158,7 +147,6 @@ def predict_next_days(expenses: list[dict], days: int = 30) -> dict:
             "is_weekend": is_weekend,
         })
 
-        # Update rolling context for next iteration
         lag_7_total = last_total
         last_total = pred
         rolling_7d = (rolling_7d * 6 + pred) / 7

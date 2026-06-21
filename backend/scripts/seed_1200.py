@@ -6,7 +6,6 @@ from app.core.database import db
 from bson import ObjectId
 
 async def seed():
-    # Find our test user
     user = await db["users"].find_one({"email": "testuser_e2e@example.com"})
     if not user:
         print("User not found. Please register first.")
@@ -14,7 +13,6 @@ async def seed():
 
     user_id = str(user["_id"])
     
-    # Clear existing expenses for this user to have exactly 1,200
     await db["expenses"].delete_many({"user_id": user_id})
     
     merchants = ["Amazon", "Uber", "Swiggy", "Zomato", "Starbucks", "Netflix", "Airtel", "DMart", "Petrol Pump"]
@@ -26,7 +24,6 @@ async def seed():
     for i in range(1200):
         idx = random.randint(0, len(merchants)-1)
         amount = random.randint(100, 2000)
-        # Randomly inject a few anomalies
         is_anomaly = False
         if i % 100 == 0:
             amount = random.randint(20000, 50000)

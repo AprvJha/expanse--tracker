@@ -1,4 +1,3 @@
-# backend/ml/prediction/evaluator.py
 import joblib
 import os
 
@@ -12,7 +11,6 @@ def get_prediction_metrics() -> dict:
     """
     Return stored model metrics.
     Linear Regression vs Rolling Average baseline comparison.
-    THIS is what you show in interviews.
     """
     if not os.path.exists(MODEL_PATH):
         return {"status": "no model trained"}

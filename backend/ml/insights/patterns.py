@@ -1,4 +1,3 @@
-# backend/ml/insights/patterns.py
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -31,7 +30,6 @@ def weekend_vs_weekday(df: pd.DataFrame) -> dict:
     weekend = df[df["is_weekend"]]
     weekday = df[~df["is_weekend"]]
 
-    # Daily averages (total / number of days)
     weekend_days = max(weekend["date"].dt.date.nunique(), 1)
     weekday_days = max(weekday["date"].dt.date.nunique(), 1)
 
@@ -147,15 +145,12 @@ def recurring_expenses(df: pd.DataFrame) -> list[dict]:
     if df.empty:
         return []
 
-    # Group by merchant
     recurring = []
     for merchant, group in df.groupby("merchant"):
-        # Must appear in at least 2 different months
         months = group["month_year"].nunique()
         if months < 2:
             continue
 
-        # Amount must be consistent (low std deviation)
         std = group["amount"].std()
         mean = group["amount"].mean()
         cv = std / mean if mean > 0 else 1  # coefficient of variation
@@ -169,7 +164,6 @@ def recurring_expenses(df: pd.DataFrame) -> list[dict]:
                 "total_paid": round(group["amount"].sum(), 2),
             })
 
-    # Sort by amount descending
     recurring.sort(key=lambda x: x["amount"], reverse=True)
     return recurring[:10]
 

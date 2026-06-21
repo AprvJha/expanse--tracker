@@ -1,4 +1,3 @@
-# backend/scripts/recategorize_uncategorized.py
 import asyncio, os, sys
 from dotenv import load_dotenv
 

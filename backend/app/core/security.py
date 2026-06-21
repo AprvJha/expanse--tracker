@@ -1,4 +1,3 @@
-# backend/app/core/security.py
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -9,7 +8,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds
 
 def hash_password(password: str) -> str:
     """Hash a plain password."""
-    # Truncate to 72 chars to avoid bcrypt limits
     password = password[:72]
     return pwd_context.hash(password)
 

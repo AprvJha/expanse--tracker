@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # reads .env automatically
+load_dotenv()
 
 MONGODB_URL = os.getenv("MONGODB_URL")
 SECRET_KEY = os.getenv("SECRET_KEY")

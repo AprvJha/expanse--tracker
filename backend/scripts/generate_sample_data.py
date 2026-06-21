@@ -1,4 +1,3 @@
-# backend/scripts/generate_sample_data.py
 import asyncio
 import random
 from datetime import datetime, timedelta
@@ -10,12 +9,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import MONGODB_URL
 
-# ─── CONFIG ───────────────────────────────────────────
 TARGET_ROWS = 1200
 MONTHS_BACK = 6
 USER_ID = "69fc6462acc4b24f3c15fbb6"
 
-# ─── MERCHANTS BY CATEGORY ────────────────────────────
 MERCHANTS = {
     "Food": [
         ("Swiggy", 80, 600),
@@ -47,11 +44,11 @@ MERCHANTS = {
         ("Big Bazaar", 300, 2000),
     ],
     "Subscription": [
-        ("Netflix", 199, 199),       # fixed
-        ("Spotify", 119, 119),       # fixed
-        ("Amazon Prime", 299, 299),  # fixed
-        ("Hotstar", 299, 299),       # fixed
-        ("YouTube Premium", 139, 139), # fixed
+        ("Netflix", 199, 199),
+        ("Spotify", 119, 119),
+        ("Amazon Prime", 299, 299),
+        ("Hotstar", 299, 299),
+        ("YouTube Premium", 139, 139),
     ],
     "Utilities": [
         ("Airtel Postpaid", 400, 999),
@@ -76,7 +73,6 @@ MERCHANTS = {
     ],
 }
 
-# ─── ANOMALIES (labeled, for Phase 4 testing) ─────────
 ANOMALIES = [
     {"merchant": "Restaurant XYZ", "category": "Food",          "amount": 4800.0},
     {"merchant": "Apple Store",    "category": "Shopping",       "amount": 89000.0},
@@ -86,25 +82,20 @@ ANOMALIES = [
     {"merchant": "Party Supplies", "category": "Entertainment",  "amount": 12000.0},
 ]
 
-# ─── HELPERS ──────────────────────────────────────────
 def get_amount(merchant_data, date):
     name, lo, hi = merchant_data
 
-    # Fixed subscription amounts
     if lo == hi:
         return float(lo)
 
     amount = random.uniform(lo, hi)
 
-    # Weekend multiplier (Sat/Sun spend more)
     if date.weekday() >= 5:
         amount *= random.uniform(1.4, 2.0)
 
-    # Month-end spike for utilities
     if date.day >= 28:
         amount *= random.uniform(1.2, 1.5)
 
-    # Payday boost (1st-3rd of month = shopping spike)
     if date.day <= 3:
         amount *= random.uniform(1.1, 1.4)
 
@@ -112,7 +103,6 @@ def get_amount(merchant_data, date):
 
 
 def get_category_weights(date):
-    """Weekends = more food/entertainment, weekdays = more transport"""
     if date.weekday() >= 5:
         return {
             "Food": 30,
@@ -147,9 +137,7 @@ def generate_transactions():
     end_date = datetime.now()
     start_date = end_date - timedelta(days=MONTHS_BACK * 30)
 
-    # ── Regular transactions ──────────────────────────
     for _ in range(TARGET_ROWS - len(ANOMALIES)):
-        # Random date in range
         days_range = (end_date - start_date).days
         random_days = random.randint(0, days_range)
         date = start_date + timedelta(days=random_days)
@@ -175,7 +163,6 @@ def generate_transactions():
             "created_at": datetime.now(),
         })
 
-    # ── Recurring subscriptions (same day each month) ─
     subscription_day = 1
     for month_offset in range(MONTHS_BACK):
         for sub_name, lo, hi in MERCHANTS["Subscription"]:
@@ -193,7 +180,6 @@ def generate_transactions():
                 "created_at": datetime.now(),
             })
 
-    # ── Inject anomalies ──────────────────────────────
     for anomaly in ANOMALIES:
         random_days = random.randint(0, (end_date - start_date).days)
         date = start_date + timedelta(days=random_days)
@@ -205,37 +191,31 @@ def generate_transactions():
             "date": date,
             "description": f"ANOMALY: {anomaly['merchant']}",
             "payment_method": random.choice(["Credit Card", "UPI"]),
-            "is_anomaly": True,      # ← labeled for Phase 4
+            "is_anomaly": True,
             "source": "generated",
             "created_at": datetime.now(),
         })
 
-    # Sort by date
     transactions.sort(key=lambda x: x["date"])
     return transactions
 
 
-# ─── MAIN ─────────────────────────────────────────────
 async def main():
     print("Connecting to MongoDB...")
     client = AsyncIOMotorClient(MONGODB_URL)
     db = client["expense_db"]
     collection = db["expenses"]
 
-    # Clear existing generated data
     deleted = await collection.delete_many({"source": "generated"})
     print(f"Cleared {deleted.deleted_count} existing generated records")
 
-    # Generate
     print("Generating transactions...")
     transactions = generate_transactions()
     print(f"Generated {len(transactions)} transactions")
 
-    # Insert
     result = await collection.insert_many(transactions)
     print(f"[OK] Inserted {len(result.inserted_ids)} transactions into MongoDB")
 
-    # Stats summary
     print("\n-- Summary ----------------------------------")
     pipeline = [
         {"$group": {"_id": "$category", "count": {"$sum": 1}, "total": {"$sum": "$amount"}}},

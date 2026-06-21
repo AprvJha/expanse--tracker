@@ -1,4 +1,3 @@
-# backend/ml/anomaly/zscore_detector.py
 import numpy as np
 import pandas as pd
 
@@ -44,7 +43,6 @@ def zscore_detect(df: pd.DataFrame, threshold: float = 2.5) -> pd.DataFrame:
 
         cat_stats = stats[category]
 
-        # Need at least 5 transactions to compute meaningful stats
         if cat_stats["count"] < 5:
             continue
 

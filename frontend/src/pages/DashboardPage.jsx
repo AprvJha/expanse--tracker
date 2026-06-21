@@ -1,4 +1,3 @@
-// frontend/src/pages/DashboardPage.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { expensesAPI, predictionAPI, suggestionsAPI } from "../services/api";
@@ -43,7 +42,6 @@ export default function DashboardPage() {
                 Dashboard
             </h2>
 
-            {/* Top suggestion banner */}
             {topSuggestion && (
                 <div style={{
                     background: `${SEVERITY_COLORS[topSuggestion.severity] || "#38bdf8"}0c`,
@@ -69,7 +67,6 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* Stat Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 16 }}>
                 <StatCard
                     label="Total Spent"
@@ -91,7 +88,6 @@ export default function DashboardPage() {
                 />
             </div>
 
-            {/* Forecast chart */}
             {forecast && forecast.predictions?.length > 0 ? (
                 <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 24, marginBottom: 16 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
@@ -136,10 +132,8 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* Category Breakdown */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
-                {/* Pie Chart */}
                 <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 24 }}>
                     <div style={{ fontSize: 12, color: "#475569", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                         Spend by Category
@@ -169,7 +163,6 @@ export default function DashboardPage() {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Category Table */}
                 <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 8, padding: 24 }}>
                     <div style={{ fontSize: 12, color: "#475569", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                         Category Breakdown
