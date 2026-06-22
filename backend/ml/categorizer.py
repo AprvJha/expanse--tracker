@@ -15,6 +15,13 @@ KEYWORD_MAP = {
         "air india", "spicejet", "vistara", "goair", "parking",
         "fastag", "toll",
     ],
+    "Subscription": [
+        "netflix", "spotify", "amazon prime", "hotstar", "disney",
+        "youtube premium", "apple music", "gaana", "jio saavn",
+        "zee5", "sonyliv", "voot", "mxplayer", "altbalaji",
+        "linkedin premium", "microsoft 365", "adobe", "canva",
+        "dropbox", "google one", "icloud",
+    ],
     "Shopping": [
         "amazon", "flipkart", "myntra", "ajio", "nykaa", "meesho",
         "snapdeal", "shopsy", "tata cliq", "reliance digital",
@@ -24,13 +31,7 @@ KEYWORD_MAP = {
         "spencer", "star bazaar", "lenskart", "pepperfry", "urban ladder",
         "ikea",
     ],
-    "Subscription": [
-        "netflix", "spotify", "amazon prime", "hotstar", "disney",
-        "youtube premium", "apple music", "gaana", "jio saavn",
-        "zee5", "sonyliv", "voot", "mxplayer", "altbalaji",
-        "linkedin premium", "microsoft 365", "adobe", "canva",
-        "dropbox", "google one", "icloud",
-    ],
+
     "Utilities": [
         "airtel", "jio", "vi ", "vodafone", "idea", "bsnl",
         "electricity", "bescom", "msedcl", "tata power", "adani electric",
