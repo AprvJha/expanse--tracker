@@ -1,5 +1,7 @@
 # AI Expense Tracker
 
+![Tests](https://github.com/AprvJha/expanse--tracker/actions/workflows/test.yml/badge.svg)
+
 A production-grade expense tracking system with real ML — not a CRUD app with charts. Categorization, anomaly detection, forecasting, and rule-based suggestions, all evaluated with precision/recall/MAE on labeled test data.
 
 **Live demo:** https://expanse-tracker-pi-eosin.vercel.app
