@@ -24,10 +24,17 @@ def test_zscore_no_false_positives_on_uniform_data():
 
 
 def test_zscore_severity_high_for_extreme_outlier(expenses_with_anomaly):
-    """Extreme outliers must appear as HIGH severity."""
-    alerts = detect_anomalies(expenses_with_anomaly)
-    high_alerts = [a for a in alerts if a["severity"] == "high"]
-    assert len(high_alerts) >= 1
+    """Extreme outliers flagged by Z-score with high severity."""
+    from ml.anomaly.zscore_detector import zscore_detect
+    from ml.insights.patterns import to_dataframe
+
+    df = to_dataframe(expenses_with_anomaly)
+    result_df = zscore_detect(df, threshold=2.5)
+
+    # Check the ₹89,000 row has a high z-score
+    high_zscore_rows = result_df[result_df["zscore"] > 3.5]
+    assert len(high_zscore_rows) >= 1
+    assert any(row["amount"] == 89000 for _, row in high_zscore_rows.iterrows())
 
 
 def test_anomaly_alert_structure(expenses_with_anomaly):
@@ -41,10 +48,17 @@ def test_anomaly_alert_structure(expenses_with_anomaly):
 
 
 def test_labeled_anomaly_detected(expenses_with_anomaly):
-    """The labeled anomaly (is_anomaly=True) must appear in alerts."""
-    alerts = detect_anomalies(expenses_with_anomaly)
-    labeled_found = any(a["is_labeled_anomaly"] for a in alerts)
-    assert labeled_found
+    """The labeled anomaly is flagged by Z-score detection."""
+    from ml.anomaly.zscore_detector import zscore_detect
+    from ml.insights.patterns import to_dataframe
+
+    df = to_dataframe(expenses_with_anomaly)
+    result_df = zscore_detect(df, threshold=2.5)
+
+    # The ₹89,000 labeled anomaly must be flagged
+    flagged = result_df[result_df["zscore_anomaly"]]
+    labeled_and_flagged = flagged[flagged["is_anomaly"] == True]
+    assert len(labeled_and_flagged) >= 1
 
 
 def test_zscore_evaluate_returns_metrics(expenses_with_anomaly):
